@@ -36,6 +36,27 @@ async function run() {
 
             res.json(result)
         })
+
+
+        app.get('/doctors', async (req, res) => {
+            const cursor = doctorsCollection.find({});
+            const page = req.query.page;
+            const size = parseInt(req.query.size);
+            let doctors;
+            const count = await cursor.count();
+
+            if (page) {
+                doctors = await cursor.skip(page * size).limit(size).toArray();
+            }
+            else {
+                doctors = await cursor.toArray();
+            }
+
+            res.send({
+                count,
+                doctors
+            })
+        });
         //Reviews
         app.post('/reviews', async (req, res) => {
             const review = req.body
@@ -123,6 +144,19 @@ async function run() {
                 }
             }
             const result = await usersCollection.updateOne(filter, updateDoc)
+            res.json(result)
+        })
+        app.put('/doctors/review', async (req, res) => {
+            const data = req.body
+            console.log(data)
+            const filter = { name: data.doctor }
+
+            const updateDoc = {
+                $set: {
+                    rating: data.rate
+                }
+            }
+            const result = await doctorsCollection.updateOne(filter, updateDoc)
             res.json(result)
         })
         app.put('/appointments/confirm', async (req, res) => {
