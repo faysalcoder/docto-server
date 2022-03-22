@@ -174,6 +174,21 @@ async function run() {
             res.json(result)
         })
 
+        app.put('/reviews/confirm', async (req, res) => {
+
+            const { reviewId } = req.body
+
+            const filter = { _id: ObjectId(reviewId) }
+
+            const updateDoc = {
+                $set: {
+                    status: true
+                }
+            }
+            const result = await reviewsCollection.updateOne(filter, updateDoc)
+            res.json(result)
+        })
+
         app.delete('/doctors/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) }
